@@ -1,0 +1,5 @@
+{
+    "python.pythonPath": "/media/external/Projects/Python/socket.io/env/bin/python3",
+    "python.linting.enabled": true,
+    "python.linting.pylintEnabled": true
+}
