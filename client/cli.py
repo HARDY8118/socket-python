@@ -61,6 +61,9 @@ def exec_command(session,command):
             conf.savec()
         except:
             pass
+    elif cmd == 'disconnect':
+        session.set_room(None)
+        session.set_connection(None)
     else:
         sio.emit('command',{'type':'user','token':session.get_token(),'command':command})
 

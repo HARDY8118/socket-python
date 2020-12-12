@@ -63,7 +63,7 @@ def handle_disconnect(sid):
 
 @sio.on('message')
 async def handle_message(sid,data):
-    if 'room' in data:
+    if 'room' in data and room!=None:
         conn.execute(messages.insert().values(timestamp=datetime.utcnow(),sent=ids[sid],received=data['connection'],message=data['message']))
         await sio.emit('msg',data['message'],room=data['room'],skip_sid=sid)
     else:
