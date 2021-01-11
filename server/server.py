@@ -103,6 +103,7 @@ async def handle_command(sid,command):
             if e.code=='gkpg':
                 await sio.emit('signed',{'success':False,'error':'Username exists'})
             else:
+                print(e)
                 await sio.emit('signed',{'success':False,'error':'DB Error'})
         except KeyError as e:
             await sio.emit('signed',{'success':False,'error':'Insufficient values'})
