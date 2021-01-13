@@ -4,6 +4,7 @@ try:
     import socketio
     from Session import Session
     from getpass import getpass
+    from profanity_filter import ProfanityFilter
     #from regwindow import Ui_RegWindow
     sio=socketio.Client()
 
@@ -13,6 +14,8 @@ try:
     conf=Userconfig()
 
     username=None
+
+    pf=ProfanityFilter()
 
     @sio.on('connect')
     def handle_connect_client():
