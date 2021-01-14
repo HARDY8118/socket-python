@@ -121,12 +121,11 @@ try:
                     if payload['username'] == cargs[0]:
                         await sio.emit('err','Cannot connect to self')
                     else:
-                        # TODO Check valid username
                         room_name="".join(sorted(payload['username']+cargs[0]))
                         sio.enter_room(usernames[cargs[0]],room_name)
                         sio.enter_room(sid,room_name)
-
-                        await sio.emit('info',{'info':'connected','room':room_name,'connection':payload['username'],'connected':cargs[0]},room=room_name)
+                        messages=conn.execute(messages.select().where(messages.c.sent in (payload['username'],cargs[0],) and messages.c.received in (cargs[0],payload['username'],)))
+                        await sio.emit('info',{'info':'connected','room':room_name,'connection':payload['username'],'connected':cargs[0],messages: messages},room=room_name)
                 except Exception as e:
                     print(e)
                     await sio.emit('err','Invalid token',room=sid)
