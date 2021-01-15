@@ -4,8 +4,8 @@ try:
     import socketio
     from Session import Session
     from getpass import getpass
-    from profanity_filter import ProfanityFilter
-    #from regwindow import Ui_RegWindow
+    import gc
+    gc.disable()
     sio=socketio.Client()
 
     session=None
@@ -14,8 +14,6 @@ try:
     conf=Userconfig()
 
     username=None
-
-    pf=ProfanityFilter()
 
     @sio.on('connect')
     def handle_connect_client():
@@ -87,6 +85,7 @@ try:
                     session=Session(sid=sio.sid,token=token)
                     # Authenticated
                     # Handle messaging
+                   
                 else:
                     print('Unauthorized')
                     # Show unauthorized error
@@ -106,6 +105,69 @@ try:
                     # Show error
         else:
             exit()
+    
+    class Ui_chat_win(object):
+        def setupUi(self, chat_win):
+            self.msgs={'hello':'s','hi':'r','how':'s','where':'r','when':'s'}
+            chat_win.setObjectName("chat_win")
+            chat_win.resize(420, 399)
+            self.centralwidget = QtWidgets.QWidget(chat_win)
+            self.centralwidget.setObjectName("centralwidget")
+            self.scrollArea = QtWidgets.QScrollArea(self.centralwidget)
+            self.scrollArea.setGeometry(QtCore.QRect(10, 10, 401, 321))
+            self.scrollArea.setWidgetResizable(True)
+            self.scrollArea.setObjectName("scrollArea")
+            self.scrollAreaWidgetContents = QtWidgets.QWidget()
+            self.scrollAreaWidgetContents.setGeometry(QtCore.QRect(0, 0, 399, 319))
+            self.scrollAreaWidgetContents.setObjectName("scrollAreaWidgetContents")
+            self.i=10
+            self.j=80
+            for msg in self.msgs:
+                if self.msgs[msg]=='r':
+                    self.recv_msg = QtWidgets.QTextBrowser(self.scrollAreaWidgetContents)
+                    self.recv_msg.setGeometry(QtCore.QRect(10, self.i, 231, 51))
+                    self.recv_msg.setObjectName("recv_msg")
+                    self.recv_msg.append(msg)
+                    self.i+=135
+                elif self.msgs[msg]=='s':
+                    self.sent_msg = QtWidgets.QTextBrowser(self.scrollAreaWidgetContents)
+                    self.sent_msg.setGeometry(QtCore.QRect(160, self.j, 231, 51))
+                    self.sent_msg.setObjectName("sent_msg")
+                    self.sent_msg.append(msg)
+                    self.j+=135
+            self.scrollArea.setWidget(self.scrollAreaWidgetContents)
+            self.msg_enter = QtWidgets.QTextEdit(self.centralwidget)
+            self.msg_enter.setGeometry(QtCore.QRect(10, 340, 331, 51))
+            self.msg_enter.setMarkdown("")
+            self.msg_enter.setObjectName("msg_enter")
+            self.send_butt = QtWidgets.QPushButton(self.centralwidget)
+            self.send_butt.setGeometry(QtCore.QRect(350, 340, 61, 51))
+            self.send_butt.clicked.connect(self.sendbuttclick)
+            font = QtGui.QFont()
+            font.setPointSize(9)
+            font.setBold(True)
+            font.setWeight(75)
+            self.send_butt.setFont(font)
+            self.send_butt.setObjectName("send_butt")
+            chat_win.setCentralWidget(self.centralwidget)
+
+            self.retranslateUi(chat_win)
+            QtCore.QMetaObject.connectSlotsByName(chat_win)
+
+        def retranslateUi(self, chat_win):
+            _translate = QtCore.QCoreApplication.translate
+            chat_win.setWindowTitle(_translate("chat_win", "MainWindow"))
+            self.msg_enter.setPlaceholderText(_translate("chat_win", "Enter Message"))
+            self.send_butt.setText(_translate("chat_win", "SEND"))
+    
+        def sendbuttclick(self):
+            if len(self.msg_enter.text())!=0:
+                self.msgs[self.msg_enter.text()]='s'
+                self.sent_msg = QtWidgets.QTextBrowser(self.scrollAreaWidgetContents)
+                self.sent_msg.setGeometry(QtCore.QRect(160, self.j, 231, 51))
+                self.sent_msg.setObjectName("sent_msg")
+                self.sent_msg.append(self.msg_enter.text())
+                self.j+=135
 
     class Ui_RegWindow(object):
         def setupUi(self, RegWindow):
@@ -177,11 +239,51 @@ try:
             global username
 
             # Close login window
-
             username=self.lineEdit_2.text()
             password=self.lineEdit_3.text()
             name=self.lineEdit.text()
             auth('s',username,password,name)
+
+    class Ui_chat_un_enter(object):
+        def setupUi(self, chat_un_enter):
+            chat_un_enter.setObjectName("chat_un_enter")
+            chat_un_enter.resize(393, 138)
+            self.centralwidget = QtWidgets.QWidget(chat_un_enter)
+            self.centralwidget.setObjectName("centralwidget")
+            self.text = QtWidgets.QLabel(self.centralwidget)
+            self.text.setGeometry(QtCore.QRect(80, 20, 231, 16))
+            font = QtGui.QFont()
+            font.setPointSize(11)
+            self.text.setFont(font)
+            self.text.setObjectName("text")
+            self.un_enter = QtWidgets.QLineEdit(self.centralwidget)
+            self.un_enter.setGeometry(QtCore.QRect(110, 60, 171, 22))
+            self.un_enter.setObjectName("un_enter")
+            self.proceed_butt = QtWidgets.QPushButton(self.centralwidget)
+            self.proceed_butt.setGeometry(QtCore.QRect(150, 100, 93, 28))
+            self.proceed_butt.setObjectName("proceed_butt")
+            self.proceed_butt.clicked.connect(self.proceedbuttclick)
+            chat_un_enter.setCentralWidget(self.centralwidget)
+
+            self.retranslateUi(chat_un_enter)
+            QtCore.QMetaObject.connectSlotsByName(chat_un_enter)
+
+        def retranslateUi(self, chat_un_enter):
+            _translate = QtCore.QCoreApplication.translate
+            chat_un_enter.setWindowTitle(_translate("chat_un_enter", "MainWindow"))
+            self.text.setText(_translate("chat_un_enter", "Enter username to chat with"))
+            self.proceed_butt.setText(_translate("chat_un_enter", "Proceed"))
+
+        def proceedbuttclick(self):
+            un=self.un_enter.text()
+            #pass un to the message funtion and return to response
+            #if response==approved
+            #self.win=QtWidgets.QMainWindow()
+            #self.ui=Ui_RegWindow()
+            #self.ui.setupUi(self.win)
+            #self.win.show()
+            #else
+            #pass
 
     class Ui_main_window(object):
         def setupUi(self, main_window):
@@ -272,12 +374,19 @@ try:
             username=self.username_enter.text()
             password=self.pass_enter.text()
             auth('l',username,password)
+            self.win=QtWidgets.QMainWindow()
+            self.ui=Ui_chat_un_enter()
+            self.ui.setupUi(self.win)
+            self.win.show()
+            
 
         def RegButtonClicked(self):
             self.win=QtWidgets.QMainWindow()
             self.ui=Ui_RegWindow()
             self.ui.setupUi(self.win)
             self.win.show()
+            
+
 
     if __name__ == "__main__":
         try:
