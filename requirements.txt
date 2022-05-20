@@ -9,7 +9,7 @@ idna==2.10
 multidict==5.0.2
 psycopg2-binary==2.8.6
 pycparser==2.20
-PyJWT==1.7.1
+PyJWT==2.4.0
 python-engineio==3.14.1
 python-socketio==4.6.1
 requests==2.25.0
